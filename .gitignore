@@ -1,0 +1,17 @@
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+/screenshots/
+
+# Allure
+reports/allure-results/
+reports/allure-report/
+
+# Auto-generated Jira defect packages (keep folder)
+reports/jira-defects/*.json
+!reports/jira-defects/.gitkeep

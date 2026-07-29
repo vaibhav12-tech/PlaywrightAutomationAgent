@@ -1,0 +1,9 @@
+{
+  "cloudId": "revance-it.atlassian.net",
+  "projectKey": "BL10",
+  "siteBaseUrl": "https://revance-it.atlassian.net",
+  "defaultPriority": "Medium",
+  "labels": ["AutomationFailure", "Playwright"],
+  "reporterDisplayName": "Automation Bot",
+  "autoCreateViaRest": false
+}

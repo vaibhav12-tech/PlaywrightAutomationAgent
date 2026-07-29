@@ -1,0 +1,13 @@
+---
+description: QA artifact paths and templates for manual cases and reports
+globs: manual-test-cases/**/*.md,templates/**/*.md,qa-report-*.md
+alwaysApply: false
+---
+
+# QA Artifacts
+
+- Manual cases: `manual-test-cases/{STORY-KEY}.md` using `templates/manual-test-case.md`
+- Reports: `qa-report-{STORY-KEY}.md` using `templates/qa-report.md`
+- Required categories: Positive, Negative, Boundary, Error Handling, Security, Integration
+- Header must include coverage % and requirement mapping
+- Link manual ↔ automated via TC ids (`TC-001`, …)

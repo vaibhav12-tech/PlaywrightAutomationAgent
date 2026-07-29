@@ -1,0 +1,42 @@
+{
+  "name": "playwrightautomation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "test": "cucumber-js --tags \"not @pending and not @signup and not @treatment and not @headless\"",
+    "test:smoke": "cucumber-js --tags \"@smoke and not @pending and not @signup and not @treatment and not @headless\"",
+    "test:regression": "cucumber-js --tags \"@regression and not @pending and not @signup and not @treatment and not @headless\"",
+    "test:signup": "cucumber-js --tags @signup",
+    "test:headless": "cross-env TEST_ENV=qa cucumber-js features/signupHeadless.feature",
+    "test:treatment": "cucumber-js --tags \"@treatment\"",
+    "test:completeprofile": "cucumber-js --tags @completeprofile",
+    "test:parallel": "cucumber-js --parallel 4 --tags \"not @pending and not @signup and not @treatment\"",
+    "test:welcome": "cucumber-js features/welcome.feature",
+    "test:welcome-and-signup": "cucumber-js features/welcome.feature features/signup.feature",
+    "allure:generate": "node ./node_modules/allure/cli.js generate reports/allure-results -o reports/allure-report",
+    "allure:open": "node ./node_modules/allure/cli.js open reports/allure-report",
+    "allure:serve": "node ./node_modules/allure/cli.js open reports/allure-results",
+    "defect:process": "ts-node scripts/process-jira-defects.ts",
+    "test:pw": "playwright test",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^12.7.0",
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^25.4.0",
+    "allure": "^3.6.0",
+    "allure-cucumberjs": "^3.7.1",
+    "allure-js-commons": "^3.7.1",
+    "cross-env": "^10.1.0",
+    "eslint": "^10.4.0",
+    "eslint-plugin-playwright": "^2.10.4",
+    "globals": "^17.6.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.60.0"
+  }
+}

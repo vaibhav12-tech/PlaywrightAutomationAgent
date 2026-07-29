@@ -1,0 +1,15 @@
+---
+description: Auto-file Jira Bugs from Playwright failures via defect packages
+alwaysApply: true
+---
+
+# Playwright → Jira Defect
+
+When Playwright tests fail or the user asks to create a Jira defect from a failure:
+
+1. Read `reports/jira-defects/latest.json` (written by `reporters/jira-defect-reporter.ts`)
+2. Follow `.cursor/skills/playwright-jira-defect-agent/SKILL.md`
+3. Create Jira Bug **only** for Product Bug + reproducible failures
+4. Skip: network, flaky, environment, test data, automation script issues
+5. Deduplicate with JQL; comment on existing ticket if found
+6. Use labels `AutomationFailure`, `Playwright`; priority Medium; type Bug

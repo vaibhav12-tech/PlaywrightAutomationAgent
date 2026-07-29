@@ -1,0 +1,14 @@
+---
+description: Playwright POM and wait conventions for generated specs
+globs: tests/**/*.ts,src/pages/**/*.ts,src/fixtures/**/*.ts
+alwaysApply: false
+---
+
+# Playwright POM Standards
+
+- Prefer existing classes in `src/pages/` — extend methods instead of new duplicate objects
+- Specs live in `tests/{STORY-KEY}.spec.ts` and use fixtures from `src/fixtures/` when available
+- Locators: role / label / placeholder first (match existing page style)
+- **Forbidden:** `waitForTimeout`, fixed sleeps, `networkidle`
+- **Allowed:** auto-waiting locators, `expect(...)`, `locator.waitFor({ state })`, `waitForURL`
+- Keep assertions in specs; keep interactions in page objects

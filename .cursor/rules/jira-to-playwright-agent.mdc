@@ -1,0 +1,18 @@
+---
+description: Jira-to-Playwright Agent 9-step QA pipeline — apply when automating Jira stories
+alwaysApply: true
+---
+
+# Jira-to-Playwright Agent
+
+When the user invokes **Jira-to-Playwright Agent** or asks to automate a Jira story into Playwright:
+
+1. Load and follow `.cursor/skills/jira-to-playwright-agent/SKILL.md`
+2. Execute STEPS 1–9 in order — do not skip framework inspection (STEP 5)
+3. Write artifacts:
+   - `manual-test-cases/{STORY-KEY}.md`
+   - `tests/{STORY-KEY}.spec.ts`
+   - `qa-report-{STORY-KEY}.md`
+4. Coverage gate: ≥95% before STEP 6
+5. Heal loop: max 3 retries after `npx playwright test`
+6. No hardcoded waits; reuse `src/pages` POM; no duplicate page objects
