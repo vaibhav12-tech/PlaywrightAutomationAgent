@@ -1,8 +1,8 @@
 /**
- * OCE Experience Cloud — login → practice → location → home.
+ * OCE Experience Cloud — login → home → Staff → Edit Role and Permissions.
  *
  * Override via env (optional):
- *   OCE_BASE_URL / OCE_USERNAME / OCE_PASSWORD / OCE_PRACTICE / OCE_LOCATION
+ *   OCE_BASE_URL / OCE_USERNAME / OCE_PASSWORD / OCE_PRACTICE / OCE_LOCATION / OCE_STAFF_NAME
  *
  * Run (headed):
  *   $env:TEST_ENV='qa'
@@ -25,13 +25,18 @@ const OCE_PASSWORD = process.env.OCE_PASSWORD || 'Revance@123456';
 const OCE_PRACTICE = process.env.OCE_PRACTICE || 'Pleasanton Dermatology';
 /** Accepts "Pleasanton - CA" or "Pleasanton CA" — POM normalizes both. */
 const OCE_LOCATION = process.env.OCE_LOCATION || 'Pleasanton - CA';
+/** Staff list display name as shown in UI (fulldev: "som prakash"). */
+const OCE_STAFF_NAME = process.env.OCE_STAFF_NAME || 'som prakash';
 
-test.describe('OCE: Login → Practice → Location → Home', () => {
-  test('Launch browser, login, select practice/location, verify home', async ({
+test.describe('OCE: Login → Staff → Edit Role and Permissions', () => {
+  test('Login, open Staff, edit roles for Som Praksah, and save', async ({
     ocePortalPage,
+    oceLeftNavPage,
+    staffMembersPage,
+    editStaffMemberPage,
     page,
   }) => {
-    test.setTimeout(300_000);
+    test.setTimeout(420_000);
 
     process.env.OCE_BASE_URL = OCE_LOGIN_URL;
 
@@ -47,7 +52,7 @@ test.describe('OCE: Login → Practice → Location → Home', () => {
     await ocePortalPage.clickLogin();
     await ocePortalPage.expectLoggedIn();
 
-    // 4. Practice → Continue
+    // 4. Practice dropdown: //*[@id="practiceScreen"]/div[3]/div[1]/select
     await ocePortalPage.selectPractice(OCE_PRACTICE);
 
     // 5. Location dropdown: //*[@id="locationScreen"]/div[2]/div[1]/select
@@ -57,5 +62,25 @@ test.describe('OCE: Login → Practice → Location → Home', () => {
     await expect(page).not.toHaveURL(/\/login\/?(\?|$)/i);
     await expect(page).not.toHaveURL(/LoginFlow/i);
     await expect(page.locator('h1#hero-title')).toBeVisible({ timeout: 90_000 });
+
+    // 7. Open left navigation (hamburger / breadcrumb menu)
+    await oceLeftNavPage.openLeftNav();
+    await oceLeftNavPage.expectLeftNavVisible();
+
+    // 8. Practice Settings → Staff → Staff Member page
+    await oceLeftNavPage.openPracticeSettings();
+    await oceLeftNavPage.expectStaffOptionVisible();
+    await oceLeftNavPage.openStaff();
+    await oceLeftNavPage.expectStaffMemberPageVisible();
+
+    // 9. Staff row → Actions (⋯) → Edit Role and Permissions
+    await staffMembersPage.openEditRoleAndPermissionsFor(OCE_STAFF_NAME);
+    await editStaffMemberPage.expectModalVisible();
+
+    // 10. Practice Role custom multi-select — select four distinct roles, then Update
+    const selectedRoles = await editStaffMemberPage.selectPracticeRoles(4);
+    expect(selectedRoles, 'Exactly four Practice Roles should be selected').toHaveLength(4);
+    await editStaffMemberPage.clickUpdateStaffMember();
+    await editStaffMemberPage.expectUpdateSuccess(selectedRoles);
   });
 });

@@ -6,6 +6,8 @@ import { ExamplePage } from '../pages/ExamplePage';
 import { RevaIsiFooterPage } from '../pages/RevaIsiFooterPage';
 import { PatientCheckoutPendingPage } from '../pages/PatientCheckoutPendingPage';
 import { EditStaffMemberPage } from '../pages/EditStaffMemberPage';
+import { OceLeftNavPage } from '../pages/OceLeftNavPage';
+import { StaffMembersPage } from '../pages/StaffMembersPage';
 
 /**
  * Shared Playwright fixtures for Jira-to-Playwright Agent generated specs.
@@ -19,6 +21,8 @@ type Pages = {
   revaIsiFooterPage: RevaIsiFooterPage;
   patientCheckoutPendingPage: PatientCheckoutPendingPage;
   editStaffMemberPage: EditStaffMemberPage;
+  oceLeftNavPage: OceLeftNavPage;
+  staffMembersPage: StaffMembersPage;
 };
 
 export const test = base.extend<Pages>({
@@ -42,6 +46,12 @@ export const test = base.extend<Pages>({
   },
   editStaffMemberPage: async ({ page }, use) => {
     await use(new EditStaffMemberPage(page));
+  },
+  oceLeftNavPage: async ({ page }, use) => {
+    await use(new OceLeftNavPage(page));
+  },
+  staffMembersPage: async ({ page }, use) => {
+    await use(new StaffMembersPage(page));
   },
 });
 

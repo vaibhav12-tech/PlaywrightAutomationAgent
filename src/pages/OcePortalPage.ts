@@ -882,8 +882,46 @@ export class OcePortalPage {
     throw new Error(`Unable to select ${fieldName} "${value}" on login flow within 90s. ${debug}`);
   }
 
+  /**
+   * Practice dropdown on LoginFlowMVN.
+   * XPath: //*[@id="practiceScreen"]/div[3]/div[1]/select
+   */
+  private practiceScreenSelect(): Locator {
+    return this.page.locator('xpath=//*[@id="practiceScreen"]/div[3]/div[1]/select');
+  }
+
   async selectPractice(practice: string) {
-    await this.selectLoginFlowField('practice', practice);
+    const practiceSelect = this.practiceScreenSelect();
+
+    // Wait until dropdown is attached, visible, and enabled (Playwright auto-wait).
+    await practiceSelect.waitFor({ state: 'visible', timeout: 60_000 });
+    await expect(practiceSelect).toBeEnabled({ timeout: 30_000 });
+
+    // Wait until the target option is present (options may load async after login).
+    await expect(practiceSelect.locator('option', { hasText: practice }).first()).toBeAttached({
+      timeout: 30_000,
+    });
+
+    // Native select — no option iteration / polling loops.
+    await practiceSelect.selectOption({ label: practice });
+
+    // Confirm selection stuck before Continue (never click Continue on -- SELECT --).
+    await expect(practiceSelect).toHaveValue(/.+/, { timeout: 10_000 });
+    const selectedText = await this.getSelectedOptionText(practiceSelect);
+    if (!selectedText || /--\s*select\s*--/i.test(selectedText)) {
+      throw new Error(
+        `Continue was NOT clicked because practice dropdown has no valid selection. ` +
+          `wanted="${practice}" selected="${selectedText}"`
+      );
+    }
+    if (!this.locationMatchesSelection(selectedText, practice)) {
+      throw new Error(
+        `Continue was NOT clicked because practice selection mismatch. ` +
+          `wanted="${practice}" selected="${selectedText}"`
+      );
+    }
+
+    await this.clickLoginFlowContinueIfVisible(this.page, { allowDisabled: false });
   }
 
   async selectLocation(location: string) {
