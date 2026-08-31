@@ -1,15 +1,21 @@
 import fs from 'fs';
 import path from 'path';
-import type { BrowserContext, Page } from '@playwright/test';
+import { expect, type BrowserContext, type Page } from '@playwright/test';
 
-/** Shared auth artifact paths for Chrome → Edge session reuse */
+/** Shared auth roots (gitignored). */
 export const AUTH_DIR = path.join('playwright', '.auth');
+export const MULTI_USER_AUTH_DIR = path.join(AUTH_DIR, 'users');
+
+/** Legacy single-user aliases (mirrored from Admin for backward compatibility). */
 export const STORAGE_STATE_FILE = path.join(AUTH_DIR, 'user.json');
 export const SESSION_BUNDLE_FILE = path.join(AUTH_DIR, 'session.json');
 
 export type SessionBundle = {
   /** Playwright storageState (cookies + localStorage) */
   storageStatePath: string;
+  userId: string;
+  username: string;
+  role?: string;
   /** Origin → key/value localStorage map (SauceDemo cart-contents lives here) */
   localStorageByOrigin: Record<string, Record<string, string>>;
   /** Origin → key/value sessionStorage map */
@@ -22,9 +28,18 @@ export type SessionBundle = {
   origin: string;
 };
 
-/**
- * Reads all sessionStorage entries from the current page origin.
- */
+export function userStorageStatePath(userId: string): string {
+  return path.join(MULTI_USER_AUTH_DIR, `${userId}.storage.json`);
+}
+
+export function userSessionBundlePath(userId: string): string {
+  return path.join(MULTI_USER_AUTH_DIR, `${userId}.session.json`);
+}
+
+export function userMetaPath(userId: string): string {
+  return path.join(MULTI_USER_AUTH_DIR, `${userId}.meta.json`);
+}
+
 export async function captureSessionStorage(page: Page): Promise<Record<string, string>> {
   return page.evaluate(() => {
     const data: Record<string, string> = {};
@@ -36,9 +51,6 @@ export async function captureSessionStorage(page: Page): Promise<Record<string, 
   });
 }
 
-/**
- * Reads all localStorage entries from the current page origin.
- */
 export async function captureLocalStorage(page: Page): Promise<Record<string, string>> {
   return page.evaluate(() => {
     const data: Record<string, string> = {};
@@ -50,9 +62,6 @@ export async function captureLocalStorage(page: Page): Promise<Record<string, st
   });
 }
 
-/**
- * Builds auth token map from cookies (and any bearer-like local/session keys).
- */
 export async function captureAuthenticationTokens(
   context: BrowserContext,
   page: Page,
@@ -62,7 +71,6 @@ export async function captureAuthenticationTokens(
   const cookies = await context.cookies(originUrl);
 
   for (const cookie of cookies) {
-    // SauceDemo uses session-username; also capture common auth cookie names
     if (/session|token|auth|jwt|access|id/i.test(cookie.name)) {
       tokens[`cookie:${cookie.name}`] = cookie.value;
     }
@@ -86,19 +94,24 @@ export async function captureAuthenticationTokens(
 }
 
 /**
- * Saves Playwright storageState + sessionStorage + product name for Edge restore.
+ * Saves per-user storageState + session bundle (cookies/local/session + product).
+ * Also mirrors Admin artifacts to legacy user.json / session.json.
  */
 export async function saveFullSession(options: {
   context: BrowserContext;
   page: Page;
   productName: string;
+  userId: string;
+  username: string;
+  role?: string;
   origin?: string;
+  mirrorLegacy?: boolean;
 }): Promise<SessionBundle> {
   const origin = options.origin ?? 'https://www.saucedemo.com';
-  fs.mkdirSync(AUTH_DIR, { recursive: true });
+  fs.mkdirSync(MULTI_USER_AUTH_DIR, { recursive: true });
 
-  // Cookies + localStorage (Playwright native format)
-  await options.context.storageState({ path: STORAGE_STATE_FILE });
+  const storageStatePath = userStorageStatePath(options.userId);
+  await options.context.storageState({ path: storageStatePath });
 
   const localStorageData = await captureLocalStorage(options.page);
   const sessionStorageData = await captureSessionStorage(options.page);
@@ -109,45 +122,53 @@ export async function saveFullSession(options: {
   );
 
   const bundle: SessionBundle = {
-    storageStatePath: STORAGE_STATE_FILE,
-    localStorageByOrigin: {
-      [origin]: localStorageData,
-    },
-    sessionStorageByOrigin: {
-      [origin]: sessionStorageData,
-    },
+    storageStatePath,
+    userId: options.userId,
+    username: options.username,
+    role: options.role,
+    localStorageByOrigin: { [origin]: localStorageData },
+    sessionStorageByOrigin: { [origin]: sessionStorageData },
     authenticationTokens,
     productName: options.productName,
     capturedAt: new Date().toISOString(),
     origin,
   };
 
-  fs.writeFileSync(SESSION_BUNDLE_FILE, JSON.stringify(bundle, null, 2), 'utf-8');
+  fs.writeFileSync(userSessionBundlePath(options.userId), JSON.stringify(bundle, null, 2), 'utf-8');
+
+  if (options.mirrorLegacy !== false && options.userId === 'admin') {
+    fs.mkdirSync(AUTH_DIR, { recursive: true });
+    fs.copyFileSync(storageStatePath, STORAGE_STATE_FILE);
+    fs.writeFileSync(SESSION_BUNDLE_FILE, JSON.stringify(bundle, null, 2), 'utf-8');
+  }
+
   return bundle;
 }
 
-export function loadSessionBundle(): SessionBundle {
-  if (!fs.existsSync(SESSION_BUNDLE_FILE)) {
+export function loadSessionBundle(userId = 'admin'): SessionBundle {
+  const perUser = userSessionBundlePath(userId);
+  const file = fs.existsSync(perUser) ? perUser : SESSION_BUNDLE_FILE;
+  if (!fs.existsSync(file)) {
     throw new Error(
-      `Missing session bundle at ${SESSION_BUNDLE_FILE}. Run Phase 1 (loginAndSaveSession) first.`
+      `Missing session bundle at ${perUser} (or legacy ${SESSION_BUNDLE_FILE}). ` +
+        `Run loginAndSaveSession / multi-user setup first.`
     );
   }
-  return JSON.parse(fs.readFileSync(SESSION_BUNDLE_FILE, 'utf-8')) as SessionBundle;
+  return JSON.parse(fs.readFileSync(file, 'utf-8')) as SessionBundle;
 }
 
-/**
- * Injects sessionStorage for the current origin, then reloads so the app picks it up.
- */
 export async function restoreSessionStorageAndReload(
   page: Page,
   sessionStorageData: Record<string, string>
 ): Promise<void> {
+  // Do not sessionStorage.clear() — wiping the store can race SauceDemo's client
+  // router and briefly surface the unauthenticated inventory error on reload.
   await page.evaluate((data) => {
-    sessionStorage.clear();
     for (const [key, value] of Object.entries(data)) {
       sessionStorage.setItem(key, value);
     }
   }, sessionStorageData);
 
-  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.reload({ waitUntil: 'load' });
+  await expect(page.locator('[data-test="error"]')).toHaveCount(0);
 }

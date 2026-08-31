@@ -1,18 +1,29 @@
-import { test as base, expect } from '@playwright/test';
-import { SignupPage } from '../pages/SignupPage';
-import { WelcomePage } from '../pages/WelcomePage';
-import { OcePortalPage } from '../pages/OcePortalPage';
-import { ExamplePage } from '../pages/ExamplePage';
-import { RevaIsiFooterPage } from '../pages/RevaIsiFooterPage';
-import { PatientCheckoutPendingPage } from '../pages/PatientCheckoutPendingPage';
-import { EditStaffMemberPage } from '../pages/EditStaffMemberPage';
-import { OceLeftNavPage } from '../pages/OceLeftNavPage';
-import { StaffMembersPage } from '../pages/StaffMembersPage';
-
 /**
- * Shared Playwright fixtures for Jira-to-Playwright Agent generated specs.
- * Extend this file with new page objects instead of instantiating ad hoc in every spec.
+ * Shared Playwright fixtures — OCE / loyalty / Jira-generated specs.
+ *
+ *   import { test, expect } from '../src/fixtures';
+ *
+ * Multi-user SauceDemo role fixtures live separately:
+ *   import { test, expect } from '../src/fixtures/session';
+ *
+ * Page objects: always from `src/pages` (canonical POM).
  */
+import { test as base, expect, type Page } from '@playwright/test';
+import {
+  SignupPage,
+  WelcomePage,
+  OcePortalPage,
+  ExamplePage,
+  RevaIsiFooterPage,
+  PatientCheckoutPendingPage,
+  EditStaffMemberPage,
+  OceLeftNavPage,
+  StaffMembersPage,
+  FileUploadPage,
+  FileDownloadPage,
+} from '../pages';
+import { resolveOceAuthConfig } from '../config/oceAuth';
+
 type Pages = {
   signupPage: SignupPage;
   welcomePage: WelcomePage;
@@ -23,6 +34,13 @@ type Pages = {
   editStaffMemberPage: EditStaffMemberPage;
   oceLeftNavPage: OceLeftNavPage;
   staffMembersPage: StaffMembersPage;
+  fileUploadPage: FileUploadPage;
+  fileDownloadPage: FileDownloadPage;
+  /**
+   * Logged-in OCE session on Home (practice + location selected).
+   * Runs once per test that requests this fixture — keep login out of business specs.
+   */
+  authenticatedPage: Page;
 };
 
 export const test = base.extend<Pages>({
@@ -53,6 +71,43 @@ export const test = base.extend<Pages>({
   staffMembersPage: async ({ page }, use) => {
     await use(new StaffMembersPage(page));
   },
+  fileUploadPage: async ({ page }, use) => {
+    await use(new FileUploadPage(page));
+  },
+  fileDownloadPage: async ({ page }, use) => {
+    await use(new FileDownloadPage(page));
+  },
+
+  authenticatedPage: async ({ page }, use, testInfo) => {
+    testInfo.setTimeout(Math.max(testInfo.timeout, 420_000));
+
+    const auth = resolveOceAuthConfig();
+    process.env.OCE_BASE_URL = auth.baseUrl;
+
+    const oce = new OcePortalPage(page);
+
+    await oce.gotoLogin();
+    await expect(page.locator('input[type="password"]').first()).toBeVisible({
+      timeout: 60_000,
+    });
+
+    await oce.enterEmail(auth.username);
+    await oce.enterPassword(auth.password);
+    await oce.clickLogin();
+    await oce.expectLoggedIn();
+
+    await oce.selectPractice(auth.practice);
+    await oce.selectLocationAndContinue(auth.location);
+
+    await expect(page).not.toHaveURL(/\/login\/?(\?|$)/i);
+    await expect(page).not.toHaveURL(/LoginFlow/i);
+    await expect(page.locator('h1#hero-title')).toBeVisible({ timeout: 90_000 });
+
+    await use(page);
+  },
 });
 
 export { expect };
+
+/** Re-export session fixtures entry for discoverability (prefer direct import). */
+export { test as sessionTest, expect as sessionExpect } from './session';

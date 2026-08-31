@@ -1,132 +1,118 @@
 import { test, expect } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
-import { LoginPage } from '../pages/LoginPage';
-import { InventoryPage } from '../pages/InventoryPage';
-import { CartPage } from '../pages/CartPage';
+import { LoginPage, InventoryPage, CartPage } from '../src/pages';
 import {
-  STORAGE_STATE_FILE,
-  SESSION_BUNDLE_FILE,
   loadSessionBundle,
   restoreSessionStorageAndReload,
+  userSessionBundlePath,
+  userStorageStatePath,
 } from '../utils/sessionStore';
+import { getUser, rolesForSetup, SESSION_ORIGIN } from '../src/session/users.config';
+import type { UserRole } from '../src/session/types';
 
 /**
- * Phase 2 (Edge)
- * 8. Launch Microsoft Edge
- * 9. Navigate to the same application
- * 10. Inject/restore session from Chrome (cookies/localStorage via storageState,
- *     sessionStorage via session.json)
- * 11. Refresh / reload
- * 12. Verify already logged in (no credentials)
- * 13. Navigate to cart
- * 14–15. Verify product from Chrome still exists and name matches
+ * Phase 2 — Multi-user session reuse (Edge project: msedge-reuse)
+ *
+ * For every role saved in Phase 1 / global-setup:
+ *  - Create context with that user's storageState (no login UI)
+ *  - Verify session-username matches users.config
+ *
+ * Admin (cart role): also restore session bundle and verify cart product.
  */
 
 const SCREENSHOT_DIR = path.join('screenshots', 'saucedemo', 'phase2-edge');
+const CART_ROLE: UserRole = (process.env.SAUCE_CART_ROLE as UserRole) || 'Admin';
+const roles = rolesForSetup();
 
-test.use({
-  channel: 'msedge',
-  // Cookies + localStorage restored from Chrome Phase 1
-  storageState: STORAGE_STATE_FILE,
-});
-
-test.describe('Phase 2 — Edge: restore Chrome session and verify cart', () => {
+test.describe('Phase 2 — Edge: reuse multi-user storageState', () => {
   test.beforeAll(() => {
-    if (!fs.existsSync(STORAGE_STATE_FILE) || !fs.existsSync(SESSION_BUNDLE_FILE)) {
-      throw new Error(
-        `Missing Chrome session artifacts.\n` +
-          `Expected:\n  - ${STORAGE_STATE_FILE}\n  - ${SESSION_BUNDLE_FILE}\n` +
-          `Run Phase 1 first:\n` +
-          `  npx playwright test tests/loginAndSaveSession.spec.ts --project=chrome-setup --headed`
-      );
-    }
     fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
-  });
-
-  test('Restore session in Edge and verify cart product from Chrome', async ({
-    page,
-  }) => {
-    const loginPage = new LoginPage(page);
-    const inventoryPage = new InventoryPage(page);
-    const cartPage = new CartPage(page);
-    const session = loadSessionBundle();
-
-    expect(session.productName.length, 'Chrome product name must be present').toBeGreaterThan(
-      0
-    );
-
-    try {
-      // 8–9. Edge launches with storageState; navigate to inventory
-      await loginPage.openAsAuthenticatedUser();
-      await loginPage.takeScreenshot(
-        path.join(SCREENSHOT_DIR, '01-edge-after-storageState.png')
-      );
-
-      // 10. Confirm localStorage cart from Chrome was restored via storageState,
-      //     and re-inject sessionStorage (if any) for a complete session restore.
-      const localStorageForOrigin =
-        session.localStorageByOrigin?.[session.origin] ??
-        session.localStorageByOrigin?.['https://www.saucedemo.com'] ??
-        {};
-      const sessionStorageForOrigin =
-        session.sessionStorageByOrigin[session.origin] ??
-        session.sessionStorageByOrigin['https://www.saucedemo.com'] ??
-        {};
-
-      expect(
-        localStorageForOrigin['cart-contents'],
-        'Chrome localStorage cart-contents must be present in session bundle'
-      ).toBeTruthy();
-
-      const edgeLocalCart = await page.evaluate(() => localStorage.getItem('cart-contents'));
-      expect(edgeLocalCart, 'Edge should already have cart-contents from storageState').toBe(
-        localStorageForOrigin['cart-contents']
-      );
-
-      // 11. Restore sessionStorage (may be empty on SauceDemo) and reload application
-      await restoreSessionStorageAndReload(page, sessionStorageForOrigin);
-      await page.screenshot({
-        path: path.join(SCREENSHOT_DIR, '02-edge-after-session-restore.png'),
-        fullPage: true,
-      });
-
-      // 12. Verify user is already logged in — no credentials entered
-      await expect(page.locator('[data-test="login-button"]')).toHaveCount(0);
-      await expect(page.getByPlaceholder('Username')).toHaveCount(0);
-      await expect(page).toHaveURL(/.*inventory\.html/);
-      await inventoryPage.expectProductsPageLoaded();
-
-      // Auth token captured in Chrome must match expected user
-      expect(session.authenticationTokens['cookie:session-username']).toBe('standard_user');
-
-      await inventoryPage.takeScreenshot(
-        path.join(SCREENSHOT_DIR, '03-edge-logged-in-products.png')
-      );
-
-      // Cart badge should reflect Chrome cart after sessionStorage restore
-      await expect(inventoryPage.shoppingCartBadge).toHaveText('1', { timeout: 10_000 });
-
-      // 13. Navigate to cart page
-      await cartPage.goto();
-      await cartPage.takeScreenshot(path.join(SCREENSHOT_DIR, '04-edge-cart.png'));
-
-      // 14–15. Verify previously selected product exists and name matches Chrome
-      await cartPage.expectProductInCart(session.productName);
-      const edgeCartProduct = await cartPage.getFirstCartProductName();
-      expect(edgeCartProduct, 'Edge cart product must match Chrome product').toBe(
-        session.productName
-      );
-
-      await cartPage.takeScreenshot(
-        path.join(SCREENSHOT_DIR, '05-edge-cart-verified.png')
-      );
-    } catch (error) {
-      await page.screenshot({
-        path: path.join(SCREENSHOT_DIR, 'error-phase2.png'),
-        fullPage: true,
-      });
-      throw error;
+    for (const role of roles) {
+      const { userId } = getUser(role);
+      const storage = userStorageStatePath(userId);
+      if (!fs.existsSync(storage)) {
+        throw new Error(
+          `Missing storageState for ${role}: ${storage}\n` +
+            `Run Phase 1 first:\n` +
+            `  npx playwright test tests/loginAndSaveSession.spec.ts --project=chrome-setup --headed`
+        );
+      }
     }
   });
+
+  for (const role of roles) {
+    const user = getUser(role);
+
+    test(`reuse ${role} (${user.username}) session without re-login`, async ({ browser }) => {
+      const storageState = path.resolve(userStorageStatePath(user.userId));
+      const context = await browser.newContext({
+        storageState,
+        baseURL: SESSION_ORIGIN,
+      });
+
+      const sessionCookie = (await context.cookies(SESSION_ORIGIN)).find(
+        (c) => c.name === 'session-username'
+      );
+      expect(
+        sessionCookie?.value,
+        `Edge context missing session-username after loading ${storageState}. ` +
+          `Cookie may be expired — re-run chrome-setup / ExecutionSuite-chrome-setup.`
+      ).toBe(user.username);
+
+      const page = await context.newPage();
+      const loginPage = new LoginPage(page);
+      const inventoryPage = new InventoryPage(page);
+      const shot = (name: string) => path.join(SCREENSHOT_DIR, `${user.userId}-${name}`);
+
+      try {
+        await loginPage.openAsAuthenticatedUser();
+        await loginPage.takeScreenshot(shot('01-restored.png'));
+
+        await expect(page.locator('[data-test="error"]')).toHaveCount(0);
+        await expect(page.locator('[data-test="login-button"]')).toHaveCount(0);
+        await expect(page.getByPlaceholder('Username')).toHaveCount(0);
+        await inventoryPage.expectProductsPageLoaded();
+
+        const cookieUser = (await context.cookies(SESSION_ORIGIN)).find(
+          (c) => c.name === 'session-username'
+        )?.value;
+        expect(cookieUser).toBe(user.username);
+
+        if (role === CART_ROLE && fs.existsSync(userSessionBundlePath(user.userId))) {
+          const cartPage = new CartPage(page);
+          const session = loadSessionBundle(user.userId);
+          expect(session.username).toBe(user.username);
+          expect(session.authenticationTokens['cookie:session-username']).toBe(user.username);
+
+          const localStorageForOrigin =
+            session.localStorageByOrigin?.[session.origin] ??
+            session.localStorageByOrigin?.[SESSION_ORIGIN] ??
+            {};
+          const sessionStorageForOrigin =
+            session.sessionStorageByOrigin[session.origin] ??
+            session.sessionStorageByOrigin[SESSION_ORIGIN] ??
+            {};
+
+          expect(localStorageForOrigin['cart-contents']).toBeTruthy();
+          const edgeLocalCart = await page.evaluate(() => localStorage.getItem('cart-contents'));
+          expect(edgeLocalCart).toBe(localStorageForOrigin['cart-contents']);
+
+          await restoreSessionStorageAndReload(page, sessionStorageForOrigin);
+          await inventoryPage.expectProductsPageLoaded();
+          await expect(inventoryPage.shoppingCartBadge).toHaveText('1', { timeout: 10_000 });
+
+          await cartPage.goto();
+          await cartPage.expectProductInCart(session.productName);
+          expect(await cartPage.getFirstCartProductName()).toBe(session.productName);
+          await cartPage.takeScreenshot(shot('02-cart-verified.png'));
+        }
+      } catch (error) {
+        await page.screenshot({ path: shot('error.png'), fullPage: true });
+        throw error;
+      } finally {
+        await context.close();
+      }
+    });
+  }
 });

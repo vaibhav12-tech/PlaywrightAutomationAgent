@@ -7,6 +7,9 @@ node_modules/
 /playwright/.cache/
 /playwright/.auth/
 /screenshots/
+/downloads/*
+!/downloads/.gitkeep
+!/downloads/.gitignore
 
 # Allure
 reports/allure-results/

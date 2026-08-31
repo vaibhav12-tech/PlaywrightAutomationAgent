@@ -1,0 +1,2 @@
+Sample upload fixture for Playwright file-transfer tests.
+Do not delete — used by tests/file-transfer/fileUpload.spec.ts

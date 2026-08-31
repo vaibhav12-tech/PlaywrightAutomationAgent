@@ -1,9 +1,7 @@
 import { test, expect } from '@playwright/test';
 import path from 'path';
 import fs from 'fs';
-import { LoginPage } from '../pages/LoginPage';
-import { InventoryPage } from '../pages/InventoryPage';
-import { CartPage } from '../pages/CartPage';
+import { LoginPage, InventoryPage, CartPage } from '../src/pages';
 
 const CREDENTIALS = {
   username: 'standard_user',

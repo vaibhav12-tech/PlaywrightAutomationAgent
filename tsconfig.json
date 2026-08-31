@@ -10,9 +10,8 @@
     "resolveJsonModule": true,
     "types": ["node", "playwright"]
   },
-  "include": [
+    "include": [
     "src",
-    "pages",
     "utils",
     "reporters",
     "scripts",
