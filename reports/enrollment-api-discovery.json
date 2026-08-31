@@ -1,0 +1,741 @@
+﻿{
+  "phone": "9929569807",
+  "email": "api.user+29569807@test.com",
+  "finalUrl": "https://revance-loyalty-git-dev-revances-projects.vercel.app/dashboard",
+  "heading": [
+    "Welcome, Api"
+  ],
+  "cookies": [
+    {
+      "name": "__vdpl",
+      "domain": "revance-loyalty-git-dev-revances-projects.vercel.app",
+      "path": "/_app/version.json"
+    },
+    {
+      "name": "__vdpl",
+      "domain": "revance-loyalty-git-dev-revances-projects.vercel.app",
+      "path": "/"
+    },
+    {
+      "name": "better-auth.session_token",
+      "domain": "revance-loyalty-git-dev-revances-projects.vercel.app",
+      "path": "/"
+    },
+    {
+      "name": "phone_verified",
+      "domain": "revance-loyalty-git-dev-revances-projects.vercel.app",
+      "path": "/"
+    },
+    {
+      "name": "better-auth.convex_jwt",
+      "domain": "revance-loyalty-git-dev-revances-projects.vercel.app",
+      "path": "/"
+    }
+  ],
+  "events": [
+    {
+      "type": "req",
+      "method": "POST",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/phone/check-voip",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/welcome",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "content-type": "application/json",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": "{\"phone\":\"+19929569807\"}"
+    },
+    {
+      "type": "req",
+      "method": "GET",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/auth/get-session",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/welcome",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null
+    },
+    {
+      "type": "req",
+      "method": "POST",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/auth/phone-number/send-otp",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/welcome",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "content-type": "application/json",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": "{\"phoneNumber\":\"+19929569807\"}"
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/phone/check-voip",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "x-vercel-cache": "MISS",
+        "content-length": "29",
+        "date": "Wed, 05 Aug 2026 11:32:54 GMT",
+        "content-type": "application/json",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::2tvt6-1785929574202-f34aab45cf6d"
+      },
+      "body": "{\"blocked\":false,\"type\":null}"
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/auth/get-session",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "x-vercel-cache": "MISS",
+        "cf-cache-status": "DYNAMIC",
+        "convex-usher": "usher",
+        "age": "0",
+        "via": "1.1 Caddy",
+        "cf-ray": "a2657bf339332030-IAD",
+        "content-length": "4",
+        "date": "Wed, 05 Aug 2026 11:32:57 GMT",
+        "content-type": "application/json",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::bns4w-1785929577352-8eb348c81bf1"
+      },
+      "body": "null"
+    },
+    {
+      "type": "req",
+      "method": "POST",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/analytics/log",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/welcome",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "content-type": "application/json",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": "{\"event\":\"otp_send_success\",\"type\":\"SUCCESS\",\"metaData\":{\"phoneNumber\":\"+********807\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36\",\"environment\":\"https://revance-loyalty-git-dev-revances-projects.vercel.app\"},\"trace\":\"+page.svelte ΓåÆ /welcome ΓåÆ handleContinue\",\"timestamp\":1785929577879}"
+    },
+    {
+      "type": "req",
+      "method": "POST",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/welcome?/submitPhone",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/welcome",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "content-type": "application/x-www-form-urlencoded",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": "phone=%2B19929569807"
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/auth/phone-number/send-otp",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "x-vercel-cache": "MISS",
+        "cf-cache-status": "DYNAMIC",
+        "convex-usher": "usher",
+        "via": "1.1 Caddy",
+        "cf-ray": "a2657bf46bc6fc18-IAD",
+        "content-length": "23",
+        "date": "Wed, 05 Aug 2026 11:32:57 GMT",
+        "content-type": "application/json",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::f9dsb-1785929577555-50990c1e3cbb"
+      },
+      "body": "{\"message\":\"code sent\"}"
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/analytics/log",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "x-vercel-cache": "MISS",
+        "content-length": "11",
+        "date": "Wed, 05 Aug 2026 11:32:58 GMT",
+        "content-type": "application/json",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::f9dsb-1785929578086-956af0898d9a"
+      },
+      "body": "{\"ok\":true}"
+    },
+    {
+      "type": "req",
+      "method": "GET",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/otp-confirmation/__data.json?x-sveltekit-invalidated=01",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/welcome",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/welcome?/submitPhone",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "x-vercel-cache": "MISS",
+        "content-length": "63",
+        "date": "Wed, 05 Aug 2026 11:32:59 GMT",
+        "content-type": "application/json",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::x4dvn-1785929578090-5fc494417b4b"
+      },
+      "body": "{\"type\":\"success\",\"status\":200,\"data\":\"[{\\\"success\\\":1},true]\"}"
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/otp-confirmation/__data.json?x-sveltekit-invalidated=01",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "private, no-store",
+        "x-vercel-cache": "MISS",
+        "age": "0",
+        "content-length": "90",
+        "date": "Wed, 05 Aug 2026 11:32:59 GMT",
+        "content-type": "application/json",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::rsbjd-1785929579541-24b5ab1e450b"
+      },
+      "body": "{\"type\":\"data\",\"nodes\":[{\"type\":\"skip\"},{\"type\":\"data\",\"data\":[{}],\"uses\":{\"parent\":1}}]}\n"
+    },
+    {
+      "type": "req",
+      "method": "POST",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/auth/phone-number/verify",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/otp-confirmation",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "content-type": "application/json",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": "{\"phoneNumber\":\"+19929569807\",\"code\":\"112233\"}"
+    },
+    {
+      "type": "req",
+      "method": "POST",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/analytics/log",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/otp-confirmation",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "content-type": "application/json",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": "{\"event\":\"otp_verify_success\",\"type\":\"SUCCESS\",\"metaData\":{\"phoneNumber\":\"+********807\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36\",\"environment\":\"https://revance-loyalty-git-dev-revances-projects.vercel.app\"},\"trace\":\"+page.svelte ΓåÆ /otp-confirmation ΓåÆ handleConfirm\",\"timestamp\":1785929580858}"
+    },
+    {
+      "type": "req",
+      "method": "POST",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/otp-confirmation?/verifyPhone",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/otp-confirmation",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "content-type": "application/x-www-form-urlencoded",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/auth/phone-number/verify",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "x-vercel-cache": "MISS",
+        "cf-cache-status": "DYNAMIC",
+        "convex-usher": "usher",
+        "via": "1.1 Caddy",
+        "cf-ray": "a2657c054b4bbacb-IAD",
+        "content-length": "300",
+        "date": "Wed, 05 Aug 2026 11:33:00 GMT",
+        "content-type": "application/json",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::6bt9w-1785929580137-d0b800d645e3"
+      },
+      "body": "{\"status\":true,\"token\":\"IyPDK36t8DPsWZyzsTyOFAFPk4c6VtlF\",\"user\":{\"name\":\"+19929569807\",\"email\":\"19929569807@temp.revance.local\",\"emailVerified\":false,\"createdAt\":1785929580768,\"updatedAt\":1785929580768,\"phoneNumber\":\"+19929569807\",\"phoneNumberVerified\":true,\"id\":\"k579grhjwvtasaqkmn02fbq0298bxw77\"}}"
+    },
+    {
+      "type": "req",
+      "method": "GET",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/auth/get-session",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/otp-confirmation",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null
+    },
+    {
+      "type": "req",
+      "method": "POST",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/customers/check",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/otp-confirmation",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "content-type": "application/json",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": "{\"phone\":\"+19929569807\"}"
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/otp-confirmation?/verifyPhone",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "x-vercel-cache": "MISS",
+        "content-length": "63",
+        "date": "Wed, 05 Aug 2026 11:33:01 GMT",
+        "content-type": "application/json",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::8tpqw-1785929581068-c2d9d991cbcb"
+      },
+      "body": "{\"type\":\"success\",\"status\":200,\"data\":\"[{\\\"success\\\":1},true]\"}"
+    },
+    {
+      "type": "req",
+      "method": "GET",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/auth/convex/token",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/otp-confirmation",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/auth/get-session",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "br",
+        "cf-cache-status": "DYNAMIC",
+        "convex-usher": "usher",
+        "age": "0",
+        "x-vercel-cache": "MISS",
+        "via": "1.1 Caddy",
+        "cf-ray": "a2657c0a7f97f48d-IAD",
+        "date": "Wed, 05 Aug 2026 11:33:01 GMT",
+        "content-type": "application/json",
+        "vary": "Accept-Encoding",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::4hhkc-1785929581078-7b4cd90ae958"
+      },
+      "body": "{\"session\":{\"expiresAt\":1786015980804,\"token\":\"IyPDK36t8DPsWZyzsTyOFAFPk4c6VtlF\",\"createdAt\":1785929580804,\"updatedAt\":1785929580804,\"ipAddress\":\"44.202.73.229\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36\",\"userId\":\"k579grhjwvtasaqkmn02fbq0298bxw77\",\"id\":\"jx7fvemd33wsnxn01c2c472hf18bwbmc\"},\"user\":{\"name\":\"+19929569807\",\"email\":\"19929569807@temp.revance.local\",\"emailVerified\":false,\"createdAt\":1785929580768,\"updatedAt\":1785929580768,\"phoneNumber\":\"+19929569807\",\"phoneNumberVerified\":true,\"id\":\"k579grhjwvtasaqkmn02fbq0298bxw77\"}}"
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/analytics/log",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "x-vercel-cache": "MISS",
+        "content-length": "11",
+        "date": "Wed, 05 Aug 2026 11:33:01 GMT",
+        "content-type": "application/json",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::f9dsb-1785929581068-615d7691585d"
+      },
+      "body": "{\"ok\":true}"
+    },
+    {
+      "type": "req",
+      "method": "GET",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/signup/__data.json?x-sveltekit-invalidated=01",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/otp-confirmation",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/customers/check",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "x-vercel-cache": "MISS",
+        "content-length": "4",
+        "date": "Wed, 05 Aug 2026 11:33:01 GMT",
+        "content-type": "application/json",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::8tpqw-1785929581329-ef429a072333"
+      },
+      "body": "null"
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/auth/convex/token",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-encoding": "br",
+        "cf-cache-status": "DYNAMIC",
+        "convex-usher": "usher",
+        "age": "0",
+        "x-vercel-cache": "MISS",
+        "via": "1.1 Caddy",
+        "cf-ray": "a2657c0cea05274d-IAD",
+        "date": "Wed, 05 Aug 2026 11:33:01 GMT",
+        "content-type": "application/json",
+        "vary": "Accept-Encoding",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::6fsl9-1785929581476-91eea17730c4"
+      },
+      "body": "{\"token\":\"eyJhbGciOiJSUzI1NiIsImtpZCI6ImtkNzVjeTJ5bXZ4eHlwZmUwNXA1eXpxN3o1ODB3czEwIn0.eyJpYXQiOjE3ODU5Mjk1ODEsIm5hbWUiOiIrMTk5Mjk1Njk4MDciLCJlbWFpbCI6IjE5OTI5NTY5ODA3QHRlbXAucmV2YW5jZS5sb2NhbCIsImVtYWlsVmVyaWZpZWQiOmZhbHNlLCJjcmVhdGVkQXQiOjE3ODU5Mjk1ODA3NjgsInVwZGF0ZWRBdCI6MTc4NTkyOTU4MDc2OCwicGhvbmVOdW1iZXIiOiIrMTk5Mjk1Njk4MDciLCJwaG9uZU51bWJlclZlcmlmaWVkIjp0cnVlLCJzZXNzaW9uSWQiOiJqeDdmdmVtZDMzd3NueG4wMWMyYzQ3MmhmMThid2JtYyIsInN1YiI6Ims1Nzlncmhqd3Z0YXNhcWttbjAyZmJxMDI5OGJ4dzc3IiwiZXhwIjoxNzg1OTMwNDgxLCJpc3MiOiJodHRwczovL2NvbWJhdGl2ZS1tb2NraW5nYmlyZC04OTQuY29udmV4LnNpdGUiLCJhdWQiOiJjb252ZXgifQ.nmx509ZoLLnpehUIXX9C0sf5gAgyW6d-gwcE2RXvEkgmdVLx9dm61QdiGllXUna8S6ep6gKlFsbgYTIg7RNbbPNCD2I6eglbj06kOLeKJlThasURDFY1kaGecMvUF8UG0FCSxH1dcabyHiwHR6IlJQksJUhZcEzQcR1XC8ZCEoUdhSTVDMXfkUnFyR3QEStW5YhlqMUAkTheB1PVpE8eXMllfjEvk7oagT5K5DHoYibXQg3WP7BG4pvwY0TyMAEO_2wnvwcS7p5BIWqWxbHbr9WyXcLq5RTPrYQtH_tRAi-nm8UOeAQST6ywlH_HxfxxBMIHPcybu8O2q2-3a0xRPA\"}"
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/signup/__data.json?x-sveltekit-invalidated=01",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "private, no-store",
+        "x-vercel-cache": "MISS",
+        "age": "0",
+        "content-length": "217",
+        "date": "Wed, 05 Aug 2026 11:33:02 GMT",
+        "content-type": "application/json",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::6fsl9-1785929581770-a21521abc7ee"
+      },
+      "body": ""
+    },
+    {
+      "type": "req",
+      "method": "POST",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/customers/signup",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/signup",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "content-type": "application/json",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": "{\"firstName\":\"Api\",\"lastName\":\"User\",\"email\":\"api.user+29569807@test.com\",\"phone\":\"+19929569807\",\"dob\":\"1992-08-03\",\"zipCode\":\"90210\",\"smsOptIn\":false,\"emailOptIn\":true,\"consentProgramCommunications\":true,\"consentMarketingSms\":false,\"consentLegalTerms\":true,\"receivedDaxxifyTreatment\":false,\"receivedRhaTreatment\":false,\"receivedSkinPenTreatment\":false}"
+    },
+    {
+      "type": "req",
+      "method": "POST",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/analytics/log",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/signup",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "content-type": "application/json",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": "{\"event\":\"user_signup_success\",\"type\":\"INFO\",\"metaData\":{\"email\":\"api.user+29569807@test.com\",\"hasPromoCode\":false,\"hasTreatmentHistory\":true,\"treatmentHistoryNoneOnly\":true,\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36\",\"environment\":\"https://revance-loyalty-git-dev-revances-projects.vercel.app\"},\"trace\":\"+page.svelte ΓåÆ /signup ΓåÆ handleSubmit\",\"timestamp\":1785929583860}"
+    },
+    {
+      "type": "req",
+      "method": "GET",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/profile-building/__data.json?destination=dashboard&x-sveltekit-invalidated=01",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/signup",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": null
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/customers/signup",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "x-vercel-cache": "MISS",
+        "content-length": "42",
+        "date": "Wed, 05 Aug 2026 11:33:03 GMT",
+        "content-type": "application/json",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::54x9m-1785929582633-7f202339a78c"
+      },
+      "body": "{\"customerId\":\"CL44192659\",\"success\":true}"
+    },
+    {
+      "type": "req",
+      "method": "POST",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/analytics/log",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/profile-building?destination=dashboard",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "content-type": "application/json",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": "{\"event\":\"profile_building_screen_display\",\"type\":\"INFO\",\"metaData\":{\"destination\":\"dashboard\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36\",\"environment\":\"https://revance-loyalty-git-dev-revances-projects.vercel.app\"},\"trace\":\"+page.svelte ΓåÆ /profile-building ΓåÆ onMount\",\"timestamp\":1785929584193}"
+    },
+    {
+      "type": "req",
+      "method": "POST",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/analytics/log",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/profile-building?destination=dashboard",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "content-type": "application/json",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": "{\"event\":\"profile_building_screen_display\",\"type\":\"INFO\",\"metaData\":{\"destination\":\"dashboard\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36\",\"environment\":\"https://revance-loyalty-git-dev-revances-projects.vercel.app\"},\"trace\":\"+page.svelte ΓåÆ /profile-building ΓåÆ onMount\",\"timestamp\":1785929584196}"
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/profile-building/__data.json?destination=dashboard&x-sveltekit-invalidated=01",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "private, no-store",
+        "x-vercel-cache": "MISS",
+        "age": "0",
+        "content-length": "149",
+        "date": "Wed, 05 Aug 2026 11:33:04 GMT",
+        "content-type": "application/json",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::2tz7k-1785929584071-9ddeed7eab50"
+      },
+      "body": "{\"type\":\"data\",\"nodes\":[{\"type\":\"skip\"},{\"type\":\"data\",\"data\":[{\"destination\":1},\"dashboard\"],\"uses\":{\"search_params\":[\"destination\"],\"parent\":1}}]}\n"
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/analytics/log",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "x-vercel-cache": "MISS",
+        "content-length": "11",
+        "date": "Wed, 05 Aug 2026 11:33:04 GMT",
+        "content-type": "application/json",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::54x9m-1785929584066-37cdfe830d35"
+      },
+      "body": "{\"ok\":true}"
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/analytics/log",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "x-vercel-cache": "MISS",
+        "content-length": "11",
+        "date": "Wed, 05 Aug 2026 11:33:04 GMT",
+        "content-type": "application/json",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::zpj5w-1785929584404-b1edf1df4227"
+      },
+      "body": "{\"ok\":true}"
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/analytics/log",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "x-vercel-cache": "MISS",
+        "content-length": "11",
+        "date": "Wed, 05 Aug 2026 11:33:04 GMT",
+        "content-type": "application/json",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::x4dvn-1785929584404-8f08a4f43ca7"
+      },
+      "body": "{\"ok\":true}"
+    },
+    {
+      "type": "req",
+      "method": "POST",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/analytics/log",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/dashboard",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "content-type": "application/json",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": "{\"event\":\"welcome_rewards_modal_display\",\"type\":\"INFO\",\"metaData\":{\"source\":\"dashboard_welcome_sync\",\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36\",\"environment\":\"https://revance-loyalty-git-dev-revances-projects.vercel.app\"},\"trace\":\"+page.svelte ΓåÆ /dashboard ΓåÆ welcome_visibility\",\"timestamp\":1785929586801}"
+    },
+    {
+      "type": "req",
+      "method": "POST",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/analytics/log",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/dashboard",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "content-type": "application/json",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": "{\"event\":\"dashboard_referral_gate_snapshot\",\"type\":\"INFO\",\"metaData\":{\"featureCustomerReferral\":false,\"giveAmount\":\"250\",\"getAmount\":\"100\",\"hasTreatmentActivity\":false,\"customerExternalIdPresent\":false,\"hasTreatmentActivityLoading\":false,\"hasTreatmentActivityError\":null,\"productOffersCount\":38,\"referralGivePointsRaw\":250,\"referralGetPointsRaw\":100,\"showReferralSection\":false,\"betaRelease\":true,\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36\",\"environment\":\"https://revance-loyalty-git-dev-revances-projects.vercel.app\"},\"trace\":\"+page.svelte ΓåÆ /dashboard ΓåÆ referral_gate_snapshot\",\"timestamp\":1785929586814}"
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/analytics/log",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "x-vercel-cache": "MISS",
+        "content-length": "11",
+        "date": "Wed, 05 Aug 2026 11:33:07 GMT",
+        "content-type": "application/json",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::94djl-1785929587010-7f2795d78206"
+      },
+      "body": "{\"ok\":true}"
+    },
+    {
+      "type": "req",
+      "method": "POST",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/analytics/log",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/dashboard",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "content-type": "application/json",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": "{\"event\":\"dashboard_referral_gate_snapshot\",\"type\":\"INFO\",\"metaData\":{\"featureCustomerReferral\":false,\"giveAmount\":\"250\",\"getAmount\":\"100\",\"hasTreatmentActivity\":false,\"customerExternalIdPresent\":true,\"hasTreatmentActivityLoading\":true,\"hasTreatmentActivityError\":null,\"productOffersCount\":38,\"referralGivePointsRaw\":250,\"referralGetPointsRaw\":100,\"showReferralSection\":false,\"betaRelease\":true,\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36\",\"environment\":\"https://revance-loyalty-git-dev-revances-projects.vercel.app\"},\"trace\":\"+page.svelte ΓåÆ /dashboard ΓåÆ referral_gate_snapshot\",\"timestamp\":1785929587244}"
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/analytics/log",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "x-vercel-cache": "MISS",
+        "content-length": "11",
+        "date": "Wed, 05 Aug 2026 11:33:07 GMT",
+        "content-type": "application/json",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::6bt9w-1785929587024-f13fa2d470b7"
+      },
+      "body": "{\"ok\":true}"
+    },
+    {
+      "type": "req",
+      "method": "POST",
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/analytics/log",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://revance-loyalty-git-dev-revances-projects.vercel.app/dashboard",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36",
+        "sec-ch-ua": "\"Not:A-Brand\";v=\"99\", \"HeadlessChrome\";v=\"145\", \"Chromium\";v=\"145\"",
+        "content-type": "application/json",
+        "sec-ch-ua-mobile": "?0"
+      },
+      "postData": "{\"event\":\"dashboard_referral_gate_snapshot\",\"type\":\"INFO\",\"metaData\":{\"featureCustomerReferral\":false,\"giveAmount\":\"250\",\"getAmount\":\"100\",\"hasTreatmentActivity\":false,\"customerExternalIdPresent\":true,\"hasTreatmentActivityLoading\":false,\"hasTreatmentActivityData\":false,\"hasTreatmentActivityError\":null,\"productOffersCount\":38,\"referralGivePointsRaw\":250,\"referralGetPointsRaw\":100,\"showReferralSection\":false,\"betaRelease\":true,\"userAgent\":\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.7632.6 Safari/537.36\",\"environment\":\"https://revance-loyalty-git-dev-revances-projects.vercel.app\"},\"trace\":\"+page.svelte ΓåÆ /dashboard ΓåÆ referral_gate_snapshot\",\"timestamp\":1785929587725}"
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/analytics/log",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "x-vercel-cache": "MISS",
+        "content-length": "11",
+        "date": "Wed, 05 Aug 2026 11:33:07 GMT",
+        "content-type": "application/json",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::2tvt6-1785929587451-203a7bfb886b"
+      },
+      "body": "{\"ok\":true}"
+    },
+    {
+      "type": "res",
+      "status": 200,
+      "url": "https://revance-loyalty-git-dev-revances-projects.vercel.app/api/analytics/log",
+      "headers": {
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-robots-tag": "noindex",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "x-vercel-cache": "MISS",
+        "content-length": "11",
+        "date": "Wed, 05 Aug 2026 11:33:08 GMT",
+        "content-type": "application/json",
+        "server": "Vercel",
+        "x-vercel-id": "bom1::iad1::hcnls-1785929588073-a36334d2aad3"
+      },
+      "body": "{\"ok\":true}"
+    }
+  ]
+}

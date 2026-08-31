@@ -158,14 +158,53 @@ export class SignupPage {
     const dayNum = Number(d);
     if (!monthNum || !dayNum) throw new Error(`Invalid date parts in: ${isoDate}`);
 
+    const MONTH_NAMES = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ] as const;
+    const monthLabel = MONTH_NAMES[monthNum - 1]!;
+
     const dateInput = this.page.locator('input[type="date"]');
     if (await dateInput.first().isVisible().catch(() => false)) {
       await dateInput.first().fill(raw);
       return;
     }
 
-    // Revance app: readonly Svelte datepicker — DOM-only value updates do not sync component state, so
-    // validation still shows "Date of birth" errors. Must pick via the real calendar UI.
+    // Current REVA signup: month <select> + day/year text inputs.
+    const monthSelect = this.page.locator(
+      'select#signup-date-of-birth, select.reva-dob-input__month'
+    ).first();
+    const dayInput = this.page
+      .getByLabel(/day of birth/i)
+      .or(this.page.locator('#signup-date-of-birth-day, input.reva-dob-input__day'))
+      .first();
+    const yearInput = this.page
+      .getByLabel(/year of birth/i)
+      .or(this.page.locator('#signup-date-of-birth-year, input.reva-dob-input__year'))
+      .first();
+
+    if (await monthSelect.isVisible().catch(() => false)) {
+      await monthSelect.selectOption({ label: monthLabel }).catch(async () => {
+        await monthSelect.selectOption({ value: String(monthNum) }).catch(async () => {
+          await monthSelect.selectOption({ value: m.padStart(2, '0') });
+        });
+      });
+      await dayInput.fill(String(dayNum).padStart(2, '0'));
+      await yearInput.fill(y);
+      return;
+    }
+
+    // Legacy Revance app: readonly Svelte datepicker — must pick via the real calendar UI.
     const dp = this.dateOfBirthInput().first();
     if (await dp.isVisible().catch(() => false)) {
       await this.selectSvelteDatepickerCalendar(dp, y, monthNum, dayNum);
@@ -188,23 +227,10 @@ export class SignupPage {
       .or(this.page.locator('select[aria-label*="year" i]'))
       .first();
 
-    const MONTH_NAMES = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ] as const;
-    const monthLabel = MONTH_NAMES[monthNum - 1];
-
-    const selectWithFallbacks = async (locator: Locator, valueAttempts: { value?: string; label?: string }[]) => {
+    const selectWithFallbacks = async (
+      locator: Locator,
+      valueAttempts: { value?: string; label?: string }[]
+    ) => {
       let lastErr: unknown;
       for (const opt of valueAttempts) {
         try {
@@ -237,34 +263,43 @@ export class SignupPage {
   }
 
   async enterEmail(value: string) {
-    await this.page.getByRole('textbox', { name: /^email$/i }).fill(value);
+    const email = this.page
+      .getByRole('textbox', { name: /^email$/i })
+      .or(this.page.getByPlaceholder(/email/i))
+      .or(this.page.locator('input[type="email"]'))
+      .first();
+    await email.fill(value);
   }
 
   async enterZipCode(value: string) {
-    const zip = this.page.getByLabel(/zip|postal/i);
-    if (await zip.count()) {
-      await zip.first().fill(value);
-      return;
-    }
-    await this.page.locator('input[name*="zip" i], input[placeholder*="zip" i]').first().fill(value);
+    const zip = this.page
+      .getByLabel(/zip|postal/i)
+      .or(this.page.getByPlaceholder(/zip/i))
+      .or(this.page.locator('input[name*="zip" i]'))
+      .first();
+    await zip.fill(value);
   }
 
+  /** Referral field is optional / may be removed from newer signup builds. */
   async enterReferralCode(value: string) {
-    const byRole = this.page.getByRole('textbox', { name: /referral|provider code/i });
-    if (await byRole.isVisible().catch(() => false)) {
-      await byRole.fill(value);
-      return;
-    }
-    await this.page.getByPlaceholder(/^enter code$/i).fill(value);
+    const field = this.page
+      .getByRole('textbox', { name: /referral|provider code/i })
+      .or(this.page.getByPlaceholder(/^enter code$/i))
+      .first();
+    if (!(await field.isVisible().catch(() => false))) return;
+    await field.fill(value);
   }
 
+  /** Apply is optional on newer signup builds that submit in one step. */
   async clickApplyOnSignUpForm() {
-    await this.page.getByRole('button', { name: /^apply$/i }).click();
+    const apply = this.page.getByRole('button', { name: /^apply$/i });
+    if (!(await apply.isVisible().catch(() => false))) return;
+    await apply.click();
   }
 
   /**
-   * Legal consent + treatment attestation. The first checkboxes on the form are treatment
-   * options; the last three are Terms/Privacy/communications — do not use a numeric limit.
+   * Treatment attestation + required legal consents.
+   * Newer UI: treatment radios/checkboxes + consent checkboxes without accessible names.
    */
   async acceptAllConsentCheckboxes() {
     const checkVisible = async (box: Locator) => {
@@ -272,24 +307,38 @@ export class SignupPage {
       await box.check({ force: true });
     };
 
-    await checkVisible(
-      this.page.getByRole('checkbox', { name: /have not received any of these treatments/i })
-    );
+    const noneTreatment = this.page
+      .locator('#treatment-NONE')
+      .or(this.page.getByRole('checkbox', { name: /none of the above|have not received any of these treatments/i }))
+      .first();
+    await checkVisible(noneTreatment);
 
     for (const pattern of [
-      /sign up for the program/i,
-      /consent to receive/i,
+      /sign up for (the program|reva)/i,
       /privacy notice|health data policy|financial incentive|terms/i,
+      /consent to receive/i,
     ]) {
       const matches = this.page.getByRole('checkbox', { name: pattern });
       for (let i = 0; i < (await matches.count()); i++) {
         await checkVisible(matches.nth(i));
       }
     }
+
+    // Fallback when consent labels are not exposed to the accessibility tree.
+    const unlabeled = this.page.locator('input.reva-signup-consent-checkbox[type="checkbox"]');
+    const count = await unlabeled.count();
+    for (let i = 0; i < count; i++) {
+      // First two consents are required; marketing consent is optional.
+      if (i >= 2) break;
+      await checkVisible(unlabeled.nth(i));
+    }
   }
 
   async clickCreateAccount() {
-    await this.page.getByRole('button', { name: /create account/i }).click();
+    const submit = this.page.getByRole('button', {
+      name: /create account|complete\s*&\s*collect|complete and collect|collect \d+ pts/i,
+    });
+    await submit.first().click();
     try {
       await this.page.waitForURL((url) => !/\/signup\/?$/i.test(url.pathname), { timeout: 60_000 });
     } catch {
@@ -305,13 +354,19 @@ export class SignupPage {
   }
 
   async clickNextRewardClaimScreen() {
-    const next = this.page.getByRole('button', { name: /^next$/i });
-    await next.waitFor({ state: 'visible', timeout: 60_000 });
-    await next.click();
+    await this.clickOnboardingNext();
   }
 
   async clickNextFollowUpScreen() {
-    const next = this.page.getByRole('button', { name: /^next$/i });
+    await this.clickOnboardingNext();
+  }
+
+  private async clickOnboardingNext() {
+    const next = this.page
+      .locator('.reva-welcome-onboarding-overlay, [role="dialog"]')
+      .getByRole('button', { name: /^next$/i })
+      .or(this.page.getByRole('button', { name: /^next$/i }))
+      .first();
     await next.waitFor({ state: 'visible', timeout: 60_000 });
     await next.click();
   }
@@ -352,6 +407,7 @@ export class SignupPage {
    * Profile questionnaire: check every visible unchecked checkbox (e.g. health/beauty questions).
    */
   async checkAllProfileQuestionCheckboxes() {
+    await this.advanceWelcomeOnboardingOverlays();
     const boxes = this.page.getByRole('checkbox');
     const n = await boxes.count();
     const limit = Math.min(n, 40);
@@ -363,21 +419,63 @@ export class SignupPage {
     }
   }
 
+  /** Advance/dismiss REVA welcome-onboarding overlays that sit above the dashboard. */
+  private async advanceWelcomeOnboardingOverlays() {
+    const overlay = this.page.locator(
+      '.reva-welcome-onboarding-overlay, [role="dialog"][aria-labelledby="welcome-rewards-title"]'
+    );
+    for (let i = 0; i < 8; i++) {
+      if (!(await overlay.first().isVisible({ timeout: 2_000 }).catch(() => false))) return;
+
+      const scope = overlay.first();
+      const primary = scope
+        .getByRole('button', {
+          name: /^(next|continue|claim|done|finish|get started|start earning)$/i,
+        })
+        .or(scope.locator('button.reva-welcome-onboarding-btn-primary'))
+        .first();
+
+      if (await primary.isVisible().catch(() => false)) {
+        await primary.click();
+        await scope.waitFor({ state: 'hidden', timeout: 5_000 }).catch(() => {});
+        continue;
+      }
+
+      const close = this.dismissButtonsIn(scope).first();
+      if (await close.isVisible().catch(() => false)) {
+        await close.click();
+        await scope.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => {});
+      }
+      return;
+    }
+  }
+
   /** Claim flow after profile questions (e.g. birthday bonus). */
   async claimBirthdayPoints() {
+    await this.advanceWelcomeOnboardingOverlays();
+
+    // Avoid matching info cards like "More information about Birthday Bonus".
     const byName = this.page.getByRole('button', {
-      name: /claim.*(birthday|points)|birthday|claim\s+(your\s+)?(birthday\s+)?points/i,
+      name: /^(claim|claim\b.*\b(birthday|points)\b.*|claim\s+(your\s+)?(birthday\s+)?points)$/i,
     });
-    if (await byName.first().isVisible({ timeout: 15_000 }).catch(() => false)) {
+    if (await byName.first().isVisible({ timeout: 10_000 }).catch(() => false)) {
       await byName.first().click();
       return;
     }
-    const genericClaim = this.page.getByRole('button', { name: /^claim$/i }).first();
-    if (await genericClaim.isVisible({ timeout: 5000 }).catch(() => false)) {
+    const genericClaim = this.page
+      .getByRole('button', { name: /^claim$/i })
+      .filter({ hasNotText: /more information/i })
+      .first();
+    if (await genericClaim.isVisible({ timeout: 3_000 }).catch(() => false)) {
       await genericClaim.click();
       return;
     }
-    await this.page.getByRole('link', { name: /claim/i }).first().click();
+    const claimLink = this.page.getByRole('link', { name: /^claim\b/i });
+    if (await claimLink.first().isVisible({ timeout: 3_000 }).catch(() => false)) {
+      await claimLink.first().click();
+      return;
+    }
+    // Newer builds surface birthday as an info card after onboarding — no claim CTA.
   }
 
   async expectDashboardPoints(expectedPoints: string) {

@@ -1,127 +1,110 @@
 import { test, expect } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
-import { LoginPage } from '../pages/LoginPage';
-import { InventoryPage } from '../pages/InventoryPage';
-import { CartPage } from '../pages/CartPage';
+import { LoginPage, InventoryPage, CartPage } from '../src/pages';
 import {
-  AUTH_DIR,
-  STORAGE_STATE_FILE,
-  SESSION_BUNDLE_FILE,
-  saveFullSession,
   captureLocalStorage,
   captureSessionStorage,
+  saveFullSession,
+  userSessionBundlePath,
+  userStorageStatePath,
 } from '../utils/sessionStore';
+import { SessionManager } from '../src/session/SessionManager';
+import { getUser, rolesForSetup, SESSION_ORIGIN } from '../src/session/users.config';
+import type { UserRole } from '../src/session/types';
 
 /**
- * Phase 1 (Chrome)
- * 1. Launch Chrome
- * 2. Navigate to SauceDemo
- * 3. Login
- * 4. Select product + add to cart
- * 5. Capture product name
- * 6. Extract cookies, localStorage, sessionStorage, auth tokens
- * 7. Close Chrome (Playwright fixture teardown)
+ * Phase 1 — Multi-user session save (Chrome)
+ *
+ * For every configured role (users.config / env):
+ *  1. Login with role credentials (no hardcoded CREDENTIALS)
+ *  2. Save per-user storageState → playwright/.auth/users/{userId}.storage.json
+ *
+ * Admin also:
+ *  3. Add product to cart
+ *  4. Save session bundle (local/session storage + product) for Edge reuse
  */
 
 const SCREENSHOT_DIR = path.join('screenshots', 'saucedemo', 'phase1-chrome');
-
-const CREDENTIALS = {
-  username: 'standard_user',
-  password: 'secret_sauce',
-} as const;
+/** Role used for cart + rich session bundle (stable SauceDemo user). */
+const CART_ROLE: UserRole = (process.env.SAUCE_CART_ROLE as UserRole) || 'Admin';
 
 test.use({
   channel: 'chrome',
 });
 
-test.describe('Phase 1 — Chrome: login, add to cart, save full session', () => {
+test.describe('Phase 1 — Chrome: multi-user login + save storageState', () => {
   test.beforeAll(() => {
-    fs.mkdirSync(AUTH_DIR, { recursive: true });
     fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
   });
 
-  test('Login, add product to cart, and save session for Edge', async ({
-    page,
-    context,
+  test('Save sessions for all roles; Admin also saves cart session bundle', async ({
+    browser,
   }) => {
-    const loginPage = new LoginPage(page);
-    const inventoryPage = new InventoryPage(page);
-    const cartPage = new CartPage(page);
+    const manager = new SessionManager(browser);
+    const roles = rolesForSetup();
 
-    try {
-      // 1–2. Chrome launches via channel; navigate to e-commerce app
-      await loginPage.goto();
-      await loginPage.takeScreenshot(path.join(SCREENSHOT_DIR, '01-login-page.png'));
+    for (const role of roles) {
+      const user = getUser(role);
+      const context = await browser.newContext({ baseURL: SESSION_ORIGIN });
+      const page = await context.newPage();
+      const loginPage = new LoginPage(page);
+      const inventoryPage = new InventoryPage(page);
+      const cartPage = new CartPage(page);
+      const shot = (name: string) => path.join(SCREENSHOT_DIR, `${user.userId}-${name}`);
 
-      // 3. Login with valid credentials
-      await loginPage.login(CREDENTIALS.username, CREDENTIALS.password);
-      await loginPage.expectLoginSuccess();
-      await inventoryPage.expectProductsPageLoaded();
-      await inventoryPage.takeScreenshot(
-        path.join(SCREENSHOT_DIR, '02-products-after-login.png')
-      );
+      try {
+        await loginPage.goto();
+        await loginPage.login(user.username, user.password);
+        await loginPage.expectLoginSuccess();
+        await inventoryPage.expectProductsPageLoaded();
+        await loginPage.takeScreenshot(shot('01-logged-in.png'));
 
-      // 4–5. Select first product, add to cart, capture product name
-      const productName = await inventoryPage.selectFirstProduct();
-      expect(productName.length, 'Product name must be captured').toBeGreaterThan(0);
-      await inventoryPage.takeScreenshot(
-        path.join(SCREENSHOT_DIR, '03-product-selected.png')
-      );
+        if (role === CART_ROLE) {
+          const productName = await inventoryPage.selectFirstProduct();
+          expect(productName.length).toBeGreaterThan(0);
+          await inventoryPage.addToCartFromDetail();
+          await inventoryPage.openCart();
+          await cartPage.expectProductInCart(productName);
+          await cartPage.takeScreenshot(shot('02-cart.png'));
 
-      await inventoryPage.addToCartFromDetail();
-      await inventoryPage.takeScreenshot(
-        path.join(SCREENSHOT_DIR, '04-added-to-cart.png')
-      );
+          const localStorageData = await captureLocalStorage(page);
+          expect(localStorageData['cart-contents']).toBeTruthy();
+          await captureSessionStorage(page);
 
-      // Confirm cart shows the selected product before saving session
-      await inventoryPage.openCart();
-      await cartPage.expectProductInCart(productName);
-      await cartPage.takeScreenshot(path.join(SCREENSHOT_DIR, '05-cart-in-chrome.png'));
+          const bundle = await saveFullSession({
+            context,
+            page,
+            productName,
+            userId: user.userId,
+            username: user.username,
+            role,
+            origin: SESSION_ORIGIN,
+            mirrorLegacy: true,
+          });
 
-      // 6. Extract cookies, localStorage, sessionStorage, authentication tokens
-      const cookies = await context.cookies('https://www.saucedemo.com');
-      expect(cookies.length, 'Expected cookies after login').toBeGreaterThan(0);
+          // Also refresh meta via SessionManager (TTL / validity).
+          await manager.persistAuthenticatedContext(role, context, page);
 
-      const localStorageData = await captureLocalStorage(page);
-      const sessionStorageData = await captureSessionStorage(page);
+          expect(fs.existsSync(userStorageStatePath(user.userId))).toBeTruthy();
+          expect(fs.existsSync(userSessionBundlePath(user.userId))).toBeTruthy();
+          expect(bundle.authenticationTokens['cookie:session-username']).toBe(user.username);
+          expect(bundle.productName).toBe(productName);
+        } else {
+          await manager.persistAuthenticatedContext(role, context, page);
+          expect(fs.existsSync(userStorageStatePath(user.userId))).toBeTruthy();
+        }
 
-      // SauceDemo cart is stored in localStorage (cart-contents) — also saved via storageState
-      expect(
-        localStorageData['cart-contents'],
-        'cart-contents should exist in localStorage after add-to-cart'
-      ).toBeTruthy();
-
-      const bundle = await saveFullSession({
-        context,
-        page,
-        productName,
-        origin: 'https://www.saucedemo.com',
-      });
-
-      expect(fs.existsSync(STORAGE_STATE_FILE)).toBeTruthy();
-      expect(fs.existsSync(SESSION_BUNDLE_FILE)).toBeTruthy();
-      expect(bundle.productName).toBe(productName);
-      expect(bundle.authenticationTokens['cookie:session-username']).toBe(
-        CREDENTIALS.username
-      );
-      // Persist localStorage snapshot inside session bundle for Edge verification/docs
-      expect(Object.keys(localStorageData).length).toBeGreaterThan(0);
-      // sessionStorage may be empty on SauceDemo; still captured for completeness
-      expect(sessionStorageData).toBeDefined();
-
-      await page.screenshot({
-        path: path.join(SCREENSHOT_DIR, '06-session-saved.png'),
-        fullPage: true,
-      });
-
-      // 7. Chrome closes automatically when this test ends (fixture teardown)
-    } catch (error) {
-      await page.screenshot({
-        path: path.join(SCREENSHOT_DIR, 'error-phase1.png'),
-        fullPage: true,
-      });
-      throw error;
+        const cookieUser = (await context.cookies(SESSION_ORIGIN)).find(
+          (c) => c.name === 'session-username'
+        )?.value;
+        expect(cookieUser).toBe(user.username);
+      } catch (error) {
+        await page.screenshot({ path: shot('error.png'), fullPage: true });
+        throw error;
+      } finally {
+        await context.close();
+      }
     }
   });
 });

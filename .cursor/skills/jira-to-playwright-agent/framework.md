@@ -27,19 +27,14 @@ playwright.config.ts
 Prefer:
 
 ```typescript
-// src/fixtures/index.ts
-import { test as base } from '@playwright/test';
-import { SignupPage } from '../pages/SignupPage';
+// OCE / Jira specs
+import { test, expect } from '../src/fixtures';
 
-export const test = base.extend<{ signupPage: SignupPage }>({
-  signupPage: async ({ page }, use) => {
-    await use(new SignupPage(page));
-  },
-});
-export { expect } from '@playwright/test';
+// SauceDemo multi-user
+import { test, expect } from '../src/fixtures/session';
 ```
 
-Specs import `test` / `expect` from fixtures when available.
+Page objects live under `src/pages` (and `src/pages/saucedemo`).
 
 ## Waits — allowed vs forbidden
 

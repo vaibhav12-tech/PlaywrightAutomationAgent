@@ -12,11 +12,13 @@ const USERNAME_LOCATORS = (scope: Page | Frame) => [
   scope.getByRole('textbox', { name: /^email$/i }),
   scope.getByLabel(/^username$/i),
   scope.getByLabel(/^email$/i),
+  // OCE fulldev login uses placeholder as a11y name (e.g. you@practice.com), not "Email"
+  scope.getByPlaceholder(/you@practice\.com|@practice\.com|username|email|user\s*name/i),
   scope.locator('#username'),
   scope.locator('input[name="username"]'),
   scope.locator('input[autocomplete="username"]'),
   scope.locator('input[type="email"]'),
-  scope.getByPlaceholder(/username|email|user\s*name/i),
+  scope.locator('input[placeholder*="@" i]'),
   scope.getByLabel(/username|email|user\s*name/i),
   scope.locator('lightning-input input.slds-input'),
   scope.locator('lightning-input input'),
@@ -41,6 +43,23 @@ const PASSWORD_LOCATORS = (scope: Page | Frame) => [
  */
 export class OcePortalPage {
   constructor(readonly page: Page) {}
+
+  /**
+   * Prefer locator/network waits. Yields to the next paint(s) only when the UI
+   * must re-render after an action with no stable locator yet (Experience Cloud).
+   */
+  private async settleUi(): Promise<void> {
+    await this.page.waitForLoadState('domcontentloaded').catch(() => {});
+    await this.page
+      .evaluate(
+        () =>
+          new Promise<void>((resolve) => {
+            requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+          })
+      )
+      .catch(() => {});
+  }
+
 
   /** Avoids injecting duplicate CSS on every poll in `resolveCredentials`. */
   private embeddedMessagingStylesApplied = false;
@@ -74,7 +93,7 @@ export class OcePortalPage {
     for (let i = 0; i < 4; i++) {
       if (await close.first().isVisible().catch(() => false)) {
         await close.first().click().catch(() => {});
-        await this.page.waitForTimeout(400);
+        await this.settleUi();
       } else break;
     }
     // Embedded chat (“Live chat: Agent Offline”) can sit above the form and block hit-testing
@@ -125,7 +144,7 @@ export class OcePortalPage {
         return found;
       }
       lastError = await this.snapshotLoginDebug();
-      await this.page.waitForTimeout(600);
+      await this.settleUi();
       await this.dismissBlockingOverlays();
     }
 
@@ -251,13 +270,30 @@ export class OcePortalPage {
   }
 
   async enterEmail(email: string) {
+    const trimmed = email?.trim() ?? '';
+    if (!trimmed || /^\.+$/.test(trimmed) || trimmed === '...') {
+      throw new Error(
+        `Invalid OCE username "${email}". Set a real value via OCE_USERNAME or oceUsername in src/config/env.{TEST_ENV}.ts (do not use "...").`
+      );
+    }
     const { username } = await this.resolveCredentials();
-    await username.fill(email);
+    await username.click({ timeout: 15_000 });
+    await username.fill('');
+    await username.fill(trimmed);
+    await expect(username).toHaveValue(trimmed, { timeout: 5_000 });
   }
 
   async enterPassword(password: string) {
+    const trimmed = password?.trim() ?? '';
+    if (!trimmed || /^\.+$/.test(trimmed) || trimmed === '...') {
+      throw new Error(
+        `Invalid OCE password. Set a real value via OCE_PASSWORD or ocePassword in src/config/env.{TEST_ENV}.ts (do not use "...").`
+      );
+    }
     const { password: pass } = await this.resolveCredentials();
-    await pass.fill(password);
+    await pass.click({ timeout: 15_000 });
+    await pass.fill('');
+    await pass.fill(trimmed);
   }
 
   async clickLogin() {
@@ -280,6 +316,18 @@ export class OcePortalPage {
   async expectLoggedIn() {
     const deadline = Date.now() + 60_000;
     while (Date.now() < deadline) {
+      const invalidCreds = await this.page
+        .getByText(/please enter valid username and password|invalid.*(username|password|credential)|login failed/i)
+        .first()
+        .isVisible()
+        .catch(() => false);
+      if (invalidCreds) {
+        throw new Error(
+          `OCE login rejected (invalid username/password) at ${this.page.url()}. ` +
+            `Check OCE_USERNAME / OCE_PASSWORD or oceUsername / ocePassword in src/config/env.${process.env.TEST_ENV || 'dev'}.ts for this sandbox.`
+        );
+      }
+
       const url = this.page.url();
       const onLoginPath = /\/login\/?(\?|$)/i.test(url);
       const passwordVisible = await this.page
@@ -288,7 +336,7 @@ export class OcePortalPage {
         .isVisible()
         .catch(() => false);
       if (!onLoginPath || !passwordVisible) return;
-      await this.page.waitForTimeout(500);
+      await this.settleUi();
     }
     throw new Error(`Login did not complete within 60s. url=${this.page.url()}`);
   }
@@ -361,7 +409,7 @@ export class OcePortalPage {
         }
       }
       if (!clicked) {
-        await this.page.waitForTimeout(900);
+        await this.settleUi();
       }
     }
   }
@@ -399,7 +447,7 @@ export class OcePortalPage {
           throw e;
         }
       }
-      await this.page.waitForTimeout(250);
+      await this.settleUi();
     }
     return false;
   }
@@ -429,7 +477,7 @@ export class OcePortalPage {
         }
       }
       await this.tryNavigateToPatientSearchContext();
-      if (!this.page.isClosed()) await this.page.waitForTimeout(450);
+      if (!this.page.isClosed()) await this.settleUi();
     }
     const url = this.page.url();
     const title = await this.page.title().catch(() => '');
@@ -459,7 +507,7 @@ export class OcePortalPage {
       await this.page
         .waitForURL((u) => u.href !== beforeUrl, { timeout: 12_000 })
         .catch(async () => {
-          if (!this.page.isClosed()) await this.page.waitForTimeout(500);
+          if (!this.page.isClosed()) await this.settleUi();
         });
       return !this.page.isClosed();
     }
@@ -500,7 +548,7 @@ export class OcePortalPage {
         }));
       }).catch((): OptionData[] => []);
       if (!options.length) {
-        await this.page.waitForTimeout(300);
+        await this.settleUi();
         continue;
       }
 
@@ -518,7 +566,7 @@ export class OcePortalPage {
       const match = exact ?? contains ?? byTokens;
       const hasOnlyPlaceholder = options.every((opt) => /--\s*select\s*--/i.test(opt.label) || !opt.value);
       if (!match && hasOnlyPlaceholder) {
-        await this.page.waitForTimeout(400);
+        await this.settleUi();
         continue;
       }
       if (match) {
@@ -595,7 +643,7 @@ export class OcePortalPage {
           return true;
         }
       }
-      await this.page.waitForTimeout(300);
+      await this.settleUi();
     }
     return false;
   }
@@ -621,7 +669,7 @@ export class OcePortalPage {
           if (visible) return true;
         }
       }
-      await this.page.waitForTimeout(200);
+      await this.settleUi();
     }
     return false;
   }
@@ -674,7 +722,7 @@ export class OcePortalPage {
       await this.page
         .waitForURL((u) => u.href !== beforeUrl, { timeout: 8_000 })
         .catch(async () => {
-          if (!this.page.isClosed()) await this.page.waitForTimeout(600);
+          if (!this.page.isClosed()) await this.settleUi();
         });
       return true;
     }
@@ -703,7 +751,7 @@ export class OcePortalPage {
 
       const clicked = await this.clickLoginFlowContinueIfVisible(fieldScope);
       if (!clicked) {
-        await this.page.waitForTimeout(500);
+        await this.settleUi();
       }
       if (!this.needsLoginFlowNavigation(this.page.url())) return;
       if (fieldName === 'practice' && (await this.isLocationStageVisible())) return;
@@ -762,7 +810,7 @@ export class OcePortalPage {
       // Still on practice — click Continue again if practice is already chosen.
       if (await this.isPracticeStageVisible()) {
         await this.clickLoginFlowContinueIfVisible();
-        await this.page.waitForTimeout(500);
+        await this.settleUi();
         continue;
       }
 
@@ -775,7 +823,7 @@ export class OcePortalPage {
             `Left login flow before location dropdown appeared. url=${this.page.url()}`
           );
         }
-        await this.page.waitForTimeout(400);
+        await this.settleUi();
         continue;
       }
 
@@ -810,7 +858,7 @@ export class OcePortalPage {
           }
         }
       }
-      await this.page.waitForTimeout(400);
+      await this.settleUi();
     }
     throw new Error(
       `Location dropdown did not become ready within ${timeoutMs / 1000}s. ` +
@@ -826,12 +874,12 @@ export class OcePortalPage {
         if (await this.hasPatientSearchFieldVisible(1_000)) return;
         // Some orgs require only practice in Login Flow; location is not shown.
         if (fieldName === 'location') return;
-        await this.page.waitForTimeout(600);
+        await this.settleUi();
         continue;
       }
       if (fieldName === 'location' && (await this.isLoginFlowFieldVisible('practice', 800))) {
         await this.clickLoginFlowContinueIfVisible();
-        await this.page.waitForTimeout(350);
+        await this.settleUi();
       }
       const allowGenericSelectFallback =
         fieldName === 'practice' || (fieldName === 'location' && (await this.isLocationStageVisible()));
@@ -859,12 +907,18 @@ export class OcePortalPage {
             if (!selected) continue;
 
             await this.advancePastLoginFlowAfterSelection(fieldName, scope);
-            await this.page.waitForTimeout(300);
+            await this.settleUi();
             if (fieldName === 'practice') {
               // Require the location stage (not a generic combobox match on Practice).
               if (await this.isLocationStageVisible()) return;
               if (!this.needsLoginFlowNavigation(this.page.url())) {
-                await this.page.waitForTimeout(1_200);
+                await expect
+                  .poll(() => !this.needsLoginFlowNavigation(this.page.url()), {
+                    timeout: 3_000,
+                    intervals: [200, 400, 800],
+                  })
+                  .toBeTruthy()
+                  .catch(() => {});
                 if (!this.needsLoginFlowNavigation(this.page.url())) return;
               }
               if (await this.hasPatientSearchFieldVisible(1_000)) return;
@@ -875,7 +929,7 @@ export class OcePortalPage {
           }
         }
       }
-      await this.page.waitForTimeout(700);
+      await this.settleUi();
     }
 
     const debug = await this.snapshotLoginDebug();
@@ -953,7 +1007,7 @@ export class OcePortalPage {
           }
         }
       }
-      await this.page.waitForTimeout(350);
+      await this.settleUi();
     }
     return null;
   }
@@ -983,10 +1037,10 @@ export class OcePortalPage {
       const clicked = await this.clickLoginFlowContinueIfVisible(preferredScope);
       if (!clicked) {
         // Continue may stay disabled until change events settle — re-fire on location select.
-        await this.page.waitForTimeout(400);
+        await this.settleUi();
         continue;
       }
-      await this.page.waitForTimeout(700);
+      await this.settleUi();
     }
     return !this.needsLoginFlowNavigation(this.page.url()) || (await this.hasPatientSearchFieldVisible(1_000));
   }
@@ -998,10 +1052,10 @@ export class OcePortalPage {
 
       const clicked = await this.clickLoginFlowContinueIfVisible();
       if (!clicked) {
-        await this.page.waitForTimeout(500);
+        await this.settleUi();
         continue;
       }
-      await this.page.waitForTimeout(400);
+      await this.settleUi();
     }
   }
 
@@ -1080,7 +1134,7 @@ export class OcePortalPage {
         await this.homeLocationChangeControl().click().catch(() => {});
       }
 
-      await this.page.waitForTimeout(400);
+      await this.settleUi();
     }
     throw new Error(
       `Location dropdown not found: //*[@id="locationScreen"]/div[2]/div[1]/select within ${timeoutMs / 1000}s. ` +
@@ -1117,7 +1171,7 @@ export class OcePortalPage {
         .locator('xpath=following::*[1]');
       const valueText = ((await locValue.innerText().catch(() => '')) || '').trim();
       if (this.locationMatchesSelection(valueText, location)) return;
-      await this.page.waitForTimeout(400);
+      await this.settleUi();
     }
     throw new Error(
       `Home LOCATION was not set to "${location}" within ${timeoutMs / 1000}s. url=${this.page.url()}`
@@ -1198,7 +1252,7 @@ export class OcePortalPage {
         }
       }
 
-      if (!selected) await this.page.waitForTimeout(500);
+      if (!selected) await this.settleUi();
     }
 
     if (!selected) {
@@ -1245,7 +1299,7 @@ export class OcePortalPage {
       });
       selectedText = await this.getSelectedOptionText(field);
       if (this.locationMatchesSelection(selectedText, location)) break;
-      await this.page.waitForTimeout(400);
+      await this.settleUi();
     }
 
     // Hard gate: never click Continue unless dropdown has a real selected value.
@@ -1299,7 +1353,7 @@ export class OcePortalPage {
       await this.ensurePastSalesforceLoginFlow();
       const url = this.page.url();
       if (/\/login\/?(\?|$)/i.test(url) || this.needsLoginFlowNavigation(url)) {
-        await this.page.waitForTimeout(500);
+        await this.settleUi();
         continue;
       }
 
@@ -1319,7 +1373,7 @@ export class OcePortalPage {
       }
 
       await this.tryNavigateToPatientSearchContext();
-      await this.page.waitForTimeout(500);
+      await this.settleUi();
     }
     throw new Error(
       `Home/dashboard did not load within ${timeoutMs / 1000}s. url=${this.page.url()}`

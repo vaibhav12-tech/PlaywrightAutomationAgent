@@ -1,5 +1,7 @@
-@completeprofile @signup @smoke @regression
-# Run: npm run test:completeprofile (or npm run test:signup). For OTP, set SIGNUP_OTP when needed.
+@loyaltyProfile @completeprofile @signup @smoke @regression
+# Run both API+UI enrollment and this complete-profile UI flow:
+#   npm run test:loyalty-profile
+# This file only: npm run test:completeprofile (or npm run test:signup). For OTP, set SIGNUP_OTP when needed.
 Feature: Revance complete profile
   New users verify their phone, complete the sign-up form, finish onboarding,
   answer profile questions, claim birthday points, and land on the rewards dashboard.
@@ -26,5 +28,6 @@ Feature: Revance complete profile
     Then I should see the dashboard with "<expected_points>" reward points
 
   Examples:
-    | phone        | verification_code | first_name | last_name | date_of_birth | email             | zip   | referral_code | expected_points |
-    | 9000000001   | 000001            | John       | Doe       | 1992-04-16    | john.doe@test.com | 90210 | REF123        | 350             |
+    # phone=UNIQUE generates a fresh number each run (existing accounts skip signup → dashboard).
+    | phone  | verification_code | first_name | last_name | date_of_birth | email             | zip   | referral_code | expected_points |
+    | UNIQUE | 112233            | John       | Doe       | 1992-08-03    | john.doe@test.com | 90210 | REF123        | 250             |
